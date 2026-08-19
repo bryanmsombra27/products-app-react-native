@@ -1,15 +1,46 @@
 import { Button, Input, Layout, Text } from '@ui-kitten/components';
-import React from 'react';
-import type { PropsWithChildren } from 'react';
-import { StyleSheet, ScrollView, useWindowDimensions } from 'react-native';
+import React, { useState } from 'react';
+import {
+  StyleSheet,
+  ScrollView,
+  useWindowDimensions,
+  Alert,
+} from 'react-native';
 import MyIcon from '../../components/ui/MyIcon';
-
-interface LoginScreenProps extends PropsWithChildren {}
+import { StackScreenProps } from '@react-navigation/stack';
+import { RootStackParams } from '../../navigation/StackNavigation';
+import { useAuthStore } from '../../store/useAuthStore';
+interface LoginScreenProps
+  extends StackScreenProps<RootStackParams, 'LoginScreen'> {}
 
 const Styles = StyleSheet.create({});
 
-const LoginScreen = ({}: LoginScreenProps): React.JSX.Element => {
+const LoginScreen = ({ navigation }: LoginScreenProps): React.JSX.Element => {
   const { height } = useWindowDimensions();
+  const login = useAuthStore(state => state.login);
+  const [isPosting, setIsPosting] = useState<boolean>(false);
+
+  const [form, setForm] = useState<{
+    email: string;
+    password: string;
+  }>({
+    email: '',
+    password: '',
+  });
+
+  const onLogin = async () => {
+    console.log('entrea', form);
+    if (form.email.length == 0 || form.password.length == 0) return;
+    setIsPosting(true);
+
+    const wasSuccessful = await login(form.email, form.password);
+
+    console.log(wasSuccessful, 'RESPUESTA  on login');
+    setIsPosting(false);
+    if (wasSuccessful) return;
+
+    Alert.alert('Error', 'Usuario o contraseña incorrectos');
+  };
 
   return (
     <Layout style={{ flex: 1 }}>
@@ -25,6 +56,12 @@ const LoginScreen = ({}: LoginScreenProps): React.JSX.Element => {
             style={{ marginBottom: 10 }}
             keyboardType="email-address"
             autoCapitalize="none"
+            onChangeText={e =>
+              setForm(state => ({
+                ...state,
+                email: e,
+              }))
+            }
             accessoryLeft={<MyIcon name="email-outline" />}
           />
           <Input
@@ -33,6 +70,12 @@ const LoginScreen = ({}: LoginScreenProps): React.JSX.Element => {
             secureTextEntry
             accessoryLeft={<MyIcon name="lock-outline" />}
             autoCapitalize="none"
+            onChangeText={e =>
+              setForm(state => ({
+                ...state,
+                password: e,
+              }))
+            }
           />
         </Layout>
 
@@ -40,7 +83,9 @@ const LoginScreen = ({}: LoginScreenProps): React.JSX.Element => {
 
         <Layout>
           <Button
-            onPress={() => {}}
+            disabled={isPosting}
+            style={isPosting && { pointerEvents: 'none' }}
+            onPress={onLogin}
             appearance="ghost"
             accessoryRight={<MyIcon name="arrow-forward-outline" white />}
           >
@@ -57,7 +102,13 @@ const LoginScreen = ({}: LoginScreenProps): React.JSX.Element => {
           }}
         >
           <Text>¿No tienes cuenta?</Text>
-          <Text status="primary" category="s1" onPress={() => {}}>
+          <Text
+            status="primary"
+            category="s1"
+            onPress={() => {
+              navigation.navigate('RegisterScreen');
+            }}
+          >
             Crea una
           </Text>
         </Layout>
