@@ -4,29 +4,25 @@ import type { PropsWithChildren } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import MyIcon from '../../components/ui/MyIcon';
 import { useAuthStore } from '../../store/useAuthStore';
+import MainLayout from '../../layouts/MainLayout';
+import useGetProducts from '../../hooks/useGetProducts';
+import FullScreenLoader from '../../components/ui/FullScreenLoader';
+import ProductList from '../../components/products/ProductList';
 
 interface HomeScreenProps extends PropsWithChildren {}
 
 const Styles = StyleSheet.create({});
 
 const HomeScreen = ({}: HomeScreenProps): React.JSX.Element => {
-  const logout = useAuthStore(state => state.logout);
+  const { data = [], error, isPending } = useGetProducts(1);
 
   return (
-    <Layout
-      style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignContent: 'center',
-      }}
+    <MainLayout
+      title="TesloShop - Productos"
+      subTitle="Aplicación administrativa"
     >
-      <Button
-        onPress={logout}
-        accessoryLeft={<MyIcon name="log-out-outline" />}
-      >
-        Cerrar Sesión
-      </Button>
-    </Layout>
+      {isPending ? <FullScreenLoader /> : <ProductList products={data} />}
+    </MainLayout>
   );
 };
 export default HomeScreen;
