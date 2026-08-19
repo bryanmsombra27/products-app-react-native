@@ -34,3 +34,14 @@ export const login = async (
     return null;
   }
 };
+
+export const authCheckStatus = async () => {
+  try {
+    const { data } = await tesloApi.get<AuthResponse>(`/auth/check-status`);
+
+    return returnUserToken(data);
+  } catch (error) {
+    console.log('Check STATUS TOKEN');
+    return null;
+  }
+};

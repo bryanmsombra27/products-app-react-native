@@ -29,7 +29,7 @@ const fadeAnimation: StackCardStyleInterpolator = ({ current }) => {
 export function StackNavigator() {
   return (
     <Stack.Navigator
-      initialRouteName="LoginScreen"
+      initialRouteName="LoadingScreen"
       screenOptions={{
         headerShown: false,
         // forma global

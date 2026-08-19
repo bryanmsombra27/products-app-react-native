@@ -13,6 +13,7 @@ import {
 } from '@ui-kitten/components';
 import * as eva from '@ui-kitten/eva';
 import { EvaIconsPack } from '@ui-kitten/eva-icons';
+import AuthProvider from './presentation/providers/AuthProvider';
 
 interface ProductsAppProps extends PropsWithChildren {}
 
@@ -47,7 +48,9 @@ const ProductsApp = ({}: ProductsAppProps): React.JSX.Element => {
             // fonts: rnTheme.fonts,
           }}
         >
-          <StackNavigator />
+          <AuthProvider>
+            <StackNavigator />
+          </AuthProvider>
         </NavigationContainer>
       </ApplicationProvider>
     </>

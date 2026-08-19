@@ -29,13 +29,11 @@ const LoginScreen = ({ navigation }: LoginScreenProps): React.JSX.Element => {
   });
 
   const onLogin = async () => {
-    console.log('entrea', form);
     if (form.email.length == 0 || form.password.length == 0) return;
     setIsPosting(true);
 
     const wasSuccessful = await login(form.email, form.password);
 
-    console.log(wasSuccessful, 'RESPUESTA  on login');
     setIsPosting(false);
     if (wasSuccessful) return;
 

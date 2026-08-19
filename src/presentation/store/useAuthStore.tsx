@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { User } from '../../domain/entities/user';
-import { login } from '../../actions/auth/auth';
+import { authCheckStatus, login } from '../../actions/auth/auth';
+import { StorageAdapter } from '../../config/AsyncStorageAdapter';
 
 export type AuthStatus = 'authenticated' | 'unauthenticated' | 'checking';
 
@@ -12,6 +13,8 @@ interface InitialState {
 
 interface Actions {
   login: (email: string, password: string) => Promise<boolean>;
+  checkStatus: () => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 type State = InitialState & Actions;
@@ -20,9 +23,35 @@ export const useAuthStore = create<State>()((set, get) => ({
   status: 'checking',
   token: '',
   user: undefined,
+  logout: async () => {
+    await StorageAdapter.removeItem('token');
+    set({
+      status: 'unauthenticated',
+      token: undefined,
+      user: undefined,
+    });
+  },
+
+  checkStatus: async () => {
+    const resp = await authCheckStatus();
+    if (!resp) {
+      set({
+        status: 'unauthenticated',
+        token: undefined,
+        user: undefined,
+      });
+      return;
+    }
+    await StorageAdapter.setItem('token', resp.token);
+
+    set({
+      status: 'authenticated',
+      token: resp.token,
+      user: resp.user,
+    });
+  },
   login: async (email, password) => {
     const response = await login(email, password);
-    console.log(response, 'RESPUESTA ');
 
     if (!response) {
       set({
@@ -32,6 +61,8 @@ export const useAuthStore = create<State>()((set, get) => ({
       });
       return false;
     }
+
+    await StorageAdapter.setItem('token', response.token);
 
     set({
       status: 'authenticated',

@@ -1,3 +1,4 @@
+import { Layout, Spinner } from '@ui-kitten/components';
 import React from 'react';
 import type { PropsWithChildren } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
@@ -8,9 +9,9 @@ const Styles = StyleSheet.create({});
 
 const LoadingScreen = ({}: LoadingScreenProps): React.JSX.Element => {
   return (
-    <View>
-      <Text> LoadingScreen View Component </Text>
-    </View>
+    <Layout style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Spinner status="primary" size="large" />
+    </Layout>
   );
 };
 export default LoadingScreen;
